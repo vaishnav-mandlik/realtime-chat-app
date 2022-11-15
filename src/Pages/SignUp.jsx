@@ -100,6 +100,7 @@ const SignUp = () => {
                 h="30px"
                 ml={5}
                 src="https://cdn.pixabay.com/photo/2016/01/03/00/43/upload-1118929_960_720.png"
+              
               ></Image>
             </Box>
 
