@@ -1,6 +1,7 @@
 import { Box, Button, Image, Text } from "@chakra-ui/react";
 import React from "react";
-
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
 const Navbar = () => {
   return (
     <Box
@@ -44,6 +45,7 @@ const Navbar = () => {
           fontSize="12px"
           ml={2}
           fontWeight="400"
+          onClick={() => signOut(auth)}
         >
           LogOut
         </Button>
