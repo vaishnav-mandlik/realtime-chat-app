@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { Box, Button, Flex, Image, Input, Link, Text } from "@chakra-ui/react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import ChatSvg from "../Icons/ChatSvg.svg";
-import { auth } from "../firebase";
 import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import ChatSvg from "../Icons/ChatSvg.svg";
+import { auth, db, storage } from "../firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+
 const SignUp = () => {
+  const navigate = useNavigate();
+
   const [data, setData] = useState({
     username: "",
     email: "",
@@ -30,48 +34,35 @@ const SignUp = () => {
         data.password
       );
 
-      const storage = getStorage();
-      const storageRef = ref(storage, "images/rivers.jpg");
+      const storageRef = ref(storage, data.username);
 
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      await uploadBytesResumable(storageRef, file).then(() => {
+        getDownloadURL(storageRef).then(async (downloadURL) => {
+          try {
+            await updateProfile(res.user, {
+              displayName: data.username,
+              photoURL: downloadURL,
+            });
+            await setDoc(doc(db, "users", res.user.uid), {
+              displayName: data.username,
+              uid: res.user.uid,
+              email: data.email,
+              photoURL: downloadURL,
+            });
 
-      // Register three observers:
-      // 1. 'state_changed' observer, called any time the state changes
-      // 2. Error observer, called on failure
-      // 3. Completion observer, called on successful completion
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
+            await setDoc(doc(db, "userChat", res.user.uid), {});
+            navigate("/");
+          } catch (err) {
+            console.log(err);
           }
-        },
-        (error) => {
-          // Handle unsuccessful uploads
-        },
-        () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            console.log("File available at", downloadURL);
-          });
-        }
-      );
-    } catch {
+        });
+      });
+    } catch (err) {
       setError(true);
+      console.log(err);
     }
 
-    console.log(data);
+    // console.log(data);
   };
 
   const onChangeHandler = (event) => {
