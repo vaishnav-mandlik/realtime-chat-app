@@ -1,17 +1,82 @@
-import React from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Image,
-  Input,
-  Link,
-  Text,
-} from "@chakra-ui/react";
-
+import React, { useState } from "react";
+import { Box, Button, Flex, Image, Input, Link, Text } from "@chakra-ui/react";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import ChatSvg from "../Icons/ChatSvg.svg";
+import { auth } from "../firebase";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 const SignUp = () => {
+  const [data, setData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [file, setFile] = useState();
+  const handleFile = (event) => {
+    setFile(event.target.files[0]);
+    // console.log(event.target.files[0]);
+  };
+  const [error, setError] = useState(false);
+  const submitHandler = async (event) => {
+    event.preventDefault();
+    try {
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+
+      const storage = getStorage();
+      const storageRef = ref(storage, "images/rivers.jpg");
+
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      // Register three observers:
+      // 1. 'state_changed' observer, called any time the state changes
+      // 2. Error observer, called on failure
+      // 3. Completion observer, called on successful completion
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+        },
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("File available at", downloadURL);
+          });
+        }
+      );
+    } catch {
+      setError(true);
+    }
+
+    console.log(data);
+  };
+
+  const onChangeHandler = (event) => {
+    setData({ ...data, [event.target.name]: event.target.value });
+  };
   return (
     <Box
       display="flex"
@@ -51,6 +116,9 @@ const SignUp = () => {
                 h="40px"
                 variant="flushed"
                 type="text"
+                name="username"
+                value={data.username}
+                onChange={onChangeHandler}
                 placeholder="UserName"
                 borderColor="#CCCCCC"
                 focusBorderColor="blackAlpha.900"
@@ -63,6 +131,9 @@ const SignUp = () => {
                 h="40px"
                 variant="flushed"
                 type="email"
+                name="email"
+                value={data.email}
+                onChange={onChangeHandler}
                 placeholder="Email"
                 borderColor="#CCCCCC"
                 focusBorderColor="blackAlpha.900"
@@ -74,6 +145,9 @@ const SignUp = () => {
                 h="40px"
                 variant="flushed"
                 type="password"
+                name="password"
+                value={data.password}
+                onChange={onChangeHandler}
                 placeholder="Password"
                 borderColor="#CCCCCC"
                 focusBorderColor="blackAlpha.900"
@@ -92,6 +166,7 @@ const SignUp = () => {
                 ml={36}
                 w="20px"
                 aria-hidden="true"
+                onChange={handleFile}
                 opacity="0"
                 cursor="pointer"
               ></Input>
@@ -100,7 +175,6 @@ const SignUp = () => {
                 h="30px"
                 ml={5}
                 src="https://cdn.pixabay.com/photo/2016/01/03/00/43/upload-1118929_960_720.png"
-              
               ></Image>
             </Box>
 
@@ -111,10 +185,13 @@ const SignUp = () => {
                 color="white"
                 borderRadius={10}
                 _hover={{ bg: "#6B62FF" }}
+                type="submit"
+                onClick={submitHandler}
               >
                 Submit
               </Button>
             </Box>
+            {error && <Text>Somthing Went Wrong</Text>}
             <Flex mt={3}>
               <Text color="black" mr={2}>
                 Alredy Have Account

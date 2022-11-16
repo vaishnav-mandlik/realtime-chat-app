@@ -4,7 +4,7 @@ import Message from "./Message";
 
 const Messages = () => {
   return (
-    <Box border="1px" h="368px">
+    <Box border="1px" h="368px" overflow="scroll">
       <Message></Message>
       <Message></Message>
       <Message></Message>
