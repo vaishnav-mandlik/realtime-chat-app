@@ -8,9 +8,7 @@ import SignUp from "./Pages/SignUp";
 
 function App() {
   const { currentUser } = useConst(AuthContext);
-  // const protectedRoute = ({ children }) => {
-  //   return currentUser === null ? <Login /> : children;
-  // };
+
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
       return <Navigate to="/login" />;
