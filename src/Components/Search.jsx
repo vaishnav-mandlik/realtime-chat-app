@@ -1,7 +1,38 @@
 import { Box, Image, Input, Text } from "@chakra-ui/react";
-import React from "react";
-
+import React, { useState } from "react";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../firebase";
+import { async } from "@firebase/util";
 const Search = () => {
+  const [username, setUsername] = useState("");
+  const [user, setUser] = useState(null);
+  const [err, setErr] = useState(false);
+
+  const serchUser = async () => {
+    // Create a query against the collection.
+    console.log(username);
+
+    const q = query(
+      collection(db, "users"),
+      where("displayName", "==", username)
+    );
+    console.log(q);
+    try {
+      const querySnapshot = await getDocs(q);
+      console.log(querySnapshot);
+      querySnapshot.forEach((doc) => {
+        setUser(doc.data());
+        console.log(doc, "doc");
+      });
+      console.log(querySnapshot);
+    } catch (error) {
+      setErr(true);
+      console.log("error at 27");
+    }
+  };
+  const KeyDonHandler = (e) => {
+    e.code === "Enter" && serchUser();
+  };
   return (
     <Box>
       <Box>
@@ -13,26 +44,31 @@ const Search = () => {
           variant="unstyled"
           pl="10px"
           py={1}
+          onChange={(event) => setUsername(event.target.value)}
+          onKeyDown={KeyDonHandler}
         ></Input>
       </Box>
-      <Box
-        display="flex"
-        flexDirection="row"
-        alignItems="center"
-        p="10px"
-        gap="10px"
-        cursor="pointer"
-      >
-        <Image
-          w="30px"
-          h="30px"
-          borderRadius="full"
-          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8&w=1000&q=80"
-        ></Image>
-        <Text fontFamily="revert" fontSize="14px">
-          Shweta
-        </Text>
-      </Box>
+      {err && <Text>User Not Found </Text>}
+      {user && (
+        <Box
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          p="10px"
+          gap="10px"
+          cursor="pointer"
+        >
+          <Image
+            w="30px"
+            h="30px"
+            borderRadius="full"
+            src={user.photoURL}
+          ></Image>
+          <Text fontFamily="revert" fontSize="14px">
+            {user.displayName}
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 };

@@ -1,8 +1,45 @@
-import React from "react";
-import { Box, Button, Flex, Image, Input, Link, Text } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, Button, Flex, Image, Input, Text } from "@chakra-ui/react";
 
 import ChatSvg from "../Icons/ChatSvg.svg";
+import { Link, useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 const Login = () => {
+  const navigate = useNavigate();
+
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState(false);
+  const submitHandler = async (event) => {
+    event.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      console.log("object");
+      navigate("/chat");
+      console.log("first");
+      // .then((userCredential) => {
+      //   // Signed in
+      //   const user = userCredential.user;
+      //   console.log(user);
+      //   // ...
+      // })
+      // .catch((error) => {
+      //   console.log(error);
+      // });
+    } catch (err) {
+      setError(true);
+      console.log(err);
+    }
+  };
+
+  const onChangeHandler = (event) => {
+    setData({ ...data, [event.target.name]: event.target.value });
+  };
+
   return (
     <Box
       display="flex"
@@ -43,7 +80,10 @@ const Login = () => {
                 h="40px"
                 variant="flushed"
                 type="email"
+                name="email"
+                value={data.email}
                 placeholder="Email"
+                onChange={onChangeHandler}
                 borderColor="#CCCCCC"
                 focusBorderColor="blackAlpha.900"
               ></Input>
@@ -54,6 +94,9 @@ const Login = () => {
                 h="40px"
                 variant="flushed"
                 type="password"
+                name="password"
+                value={data.password}
+                onChange={onChangeHandler}
                 placeholder="Password"
                 borderColor="#CCCCCC"
                 focusBorderColor="blackAlpha.900"
@@ -67,6 +110,7 @@ const Login = () => {
                 color="white"
                 borderRadius={10}
                 _hover={{ bg: "#6B62FF" }}
+                onClick={submitHandler}
               >
                 Login
               </Button>
@@ -75,7 +119,7 @@ const Login = () => {
               <Text color="black" mr={2}>
                 Create Account
               </Text>
-              <Link fontStyle="italic" color="#6B62FF">
+              <Link to="/signup" fontStyle="italic" color="#6B62FF">
                 Sign Up
               </Link>
             </Flex>

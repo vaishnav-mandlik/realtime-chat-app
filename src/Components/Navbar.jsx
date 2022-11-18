@@ -1,8 +1,11 @@
 import { Box, Button, Image, Text } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import { AuthContext } from "../Context/AuthContext";
 const Navbar = () => {
+  const currentUser = useContext(AuthContext);
+  console.log(currentUser);
   return (
     <Box
       display="flex"
@@ -27,7 +30,7 @@ const Navbar = () => {
           w="25px"
           h="25px"
           borderRadius="full"
-          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8dXNlciUyMHByb2ZpbGV8ZW58MHx8MHx8&w=1000&q=80"
+          src={currentUser.currentUser.photoURL}
         ></Image>
         <Text
           fontFamily="revert"
@@ -36,7 +39,7 @@ const Navbar = () => {
           mt={1}
           fontWeight="600"
         >
-          Name
+          {currentUser.currentUser.displayName}
         </Text>
         <Button
           borderRadius={30}

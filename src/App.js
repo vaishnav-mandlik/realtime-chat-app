@@ -1,4 +1,5 @@
 import { useConst } from "@chakra-ui/react";
+import { useContext } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AuthContext, AuthContextProvider } from "./Context/AuthContext";
@@ -7,19 +8,20 @@ import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
 
 function App() {
-  const { currentUser } = useConst(AuthContext);
+  const { currentUser } = useContext(AuthContext);
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
       return <Navigate to="/login" />;
     }
+    return children;
   };
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/">
           <Route
-            index
+            path="chat"
             element={
               <ProtectedRoute>
                 <Chat />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Button, Flex, Image, Input, Link, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Input, Text } from "@chakra-ui/react";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -9,7 +9,7 @@ import ChatSvg from "../Icons/ChatSvg.svg";
 import { auth, db, storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -61,8 +61,6 @@ const SignUp = () => {
       setError(true);
       console.log(err);
     }
-
-    // console.log(data);
   };
 
   const onChangeHandler = (event) => {
@@ -187,7 +185,7 @@ const SignUp = () => {
               <Text color="black" mr={2}>
                 Alredy Have Account
               </Text>
-              <Link fontStyle="italic" color="#6B62FF">
+              <Link to="/login" fontStyle="italic" color="#6B62FF">
                 Login
               </Link>
             </Flex>
