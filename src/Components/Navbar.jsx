@@ -12,8 +12,9 @@ const Navbar = () => {
       justifyContent="space-between"
       px={2}
       h="50px"
-      border="1px"
+      borderRadius="20px 0px 0px 0px"
       alignItems="center"
+      backgroundColor="gray.200"
     >
       <Box>
         <Text

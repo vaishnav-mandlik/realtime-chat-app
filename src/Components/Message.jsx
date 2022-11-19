@@ -1,8 +1,12 @@
 import { Box, Image, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { AuthContext } from "../Context/AuthContext";
+import { ChatContext } from "../Context/ChatContext";
 
-const Message = () => {
+const Message = ({ message }) => {
   const [owner, setOwner] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+  const { data } = useContext(ChatContext);
 
   return (
     <Box
@@ -10,7 +14,8 @@ const Message = () => {
       mt={3}
       ml={3}
       style={{
-        flexDirection: owner === true ? "row-reverse" : "",
+        flexDirection:
+          message.senderId === currentUser.uid ? "row-reverse" : "",
         marginRight: "15px",
       }}
     >
@@ -19,11 +24,12 @@ const Message = () => {
           w="30px"
           h="30px"
           borderRadius="full"
-          src="https://image1.masterfile.com/getImage/NjAwLTAyNzAwNzExZW4uMDAwMDAwMDA=AKe56J/600-02700711en_Masterfile.jpg"
+          src={
+            message.senderId === currentUser.uid
+              ? currentUser.photoURL
+              : data.user.photoURL
+          }
         ></Image>
-        <Text fontSize="8px" mt={1}>
-          Just Now
-        </Text>
       </Box>
       <Box ml={1} maxW="60%">
         <Text
@@ -38,15 +44,17 @@ const Message = () => {
             marginRight: "5px",
           }}
         >
-          Hello
+          {message.text}
         </Text>
-        <Image
-          w="100px"
-          h="130px"
-          mt={2}
-          borderRadius="10px"
-          src="https://img.freepik.com/free-vector/illustration-business-agreement-concept_53876-43716.jpg?w=2000"
-        ></Image>
+        {message.file && (
+          <Image
+            w="100px"
+            h="130px"
+            mt={2}
+            borderRadius="10px"
+            src={message?.file}
+          ></Image>
+        )}
       </Box>
     </Box>
   );

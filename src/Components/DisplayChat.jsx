@@ -1,27 +1,25 @@
 import { Box, Image, Text } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
+import { ChatContext } from "../Context/ChatContext";
 import Messages from "./Messages";
 import UserInputMsg from "./UserInputMsg";
 
 const DisplayChat = () => {
+  const { data } = useContext(ChatContext);
+  console.log(data);
   return (
-    <Box flex={2} border="1px">
+    <Box flex={2}>
       <Box
         display="flex"
-        border="1px"
+        bgColor="gray.200"
+        borderRadius="0px 20px 0px 0px"
         h="50px"
         alignItems="center"
         justifyContent="space-between"
         px={5}
       >
-        <Text border="1px">Shweta</Text>
-        <Box
-          border="1px"
-          display="flex"
-          gap="10px"
-          w="80px"
-          alignItems="center"
-        >
+        <Text>{data.user.displayName}</Text>
+        <Box display="flex" gap="10px" w="80px" alignItems="center">
           <Image
             w="18px"
             h="18px"

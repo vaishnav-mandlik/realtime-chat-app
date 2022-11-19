@@ -1,13 +1,23 @@
 import { Box, Image, Input, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import React, { useContext, useState } from "react";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
-import { async } from "@firebase/util";
+import { AuthContext } from "../Context/AuthContext";
 const Search = () => {
   const [username, setUsername] = useState("");
   const [user, setUser] = useState(null);
   const [err, setErr] = useState(false);
-
+  const { currentUser } = useContext(AuthContext);
   const serchUser = async () => {
     // Create a query against the collection.
     console.log(username);
@@ -33,8 +43,45 @@ const Search = () => {
   const KeyDonHandler = (e) => {
     e.code === "Enter" && serchUser();
   };
+
+  const handleSelect = async () => {
+    // console.log("49");
+    const combineId =
+      currentUser.uid > user.uid
+        ? currentUser.uid + user.uid
+        : user.uid + currentUser.uid;
+
+    try {
+      const res = await getDoc(doc(db, "chats", combineId));
+      console.log(res);
+      if (!res.exists()) {
+        await setDoc(doc(db, "chats", combineId), { messages: [] });
+        await updateDoc(doc(db, "userChat", currentUser.uid), {
+          [combineId + ".userInfo"]: {
+            uid: user.uid,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          },
+          [combineId + ".date"]: serverTimestamp(),
+        });
+        await updateDoc(doc(db, "userChat", user.uid), {
+          [combineId + ".userInfo"]: {
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+          },
+          [combineId + ".date"]: serverTimestamp(),
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setUser(null);
+    setUsername("");
+  };
+
   return (
-    <Box>
+    <Box borderRight="2px" borderColor="gray.200">
       <Box>
         <Input
           placeholder="Search User Name"
@@ -44,6 +91,7 @@ const Search = () => {
           variant="unstyled"
           pl="10px"
           py={1}
+          value={username}
           onChange={(event) => setUsername(event.target.value)}
           onKeyDown={KeyDonHandler}
         ></Input>
@@ -57,6 +105,7 @@ const Search = () => {
           p="10px"
           gap="10px"
           cursor="pointer"
+          onClick={handleSelect}
         >
           <Image
             w="30px"

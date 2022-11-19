@@ -7,7 +7,7 @@ import Search from "./Search";
 const Sidebar = () => {
   return (
     <>
-      <Box flex={1} border="1px">
+      <Box flex={1}>
         <Navbar></Navbar>
         <Search />
         <Chats />
