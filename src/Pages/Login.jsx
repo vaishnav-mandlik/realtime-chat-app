@@ -19,7 +19,7 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
       console.log("object");
-      navigate("/chat");
+      navigate("/");
       console.log("first");
       // .then((userCredential) => {
       //   // Signed in
