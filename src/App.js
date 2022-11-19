@@ -19,18 +19,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/">
-          <Route
-            index
-            element={
-              <ProtectedRoute>
-                <Chat />
-              </ProtectedRoute>
-            }
-          ></Route>
-          <Route path="login" element={<Login></Login>}></Route>
-          <Route path="signup" element={<SignUp></SignUp>}></Route>
-        </Route>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route path="/login" element={<Login></Login>}></Route>
+        <Route path="/signup" element={<SignUp></SignUp>}></Route>
       </Routes>
     </BrowserRouter>
   );
